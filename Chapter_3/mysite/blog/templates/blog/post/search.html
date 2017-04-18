@@ -1,0 +1,25 @@
+{% extends "blog/base.html" %}             <!--继承主url-->
+{% block title %}Search{% endblock %}      <!--定义seach区间-->
+{% block content %}           
+
+    {% if "query" in request.GET %}            <!--判断表单（form）已经被提交，我们将在request.GET字典中查找query参数-->
+        <h1>找到含有关键字"{{ cd.query }}"的帖子</h1>  <!--显示文字提示-使用cd.query字典的方法，显示出查询的字段-->
+        <h3>Found {{ total_results }} result{{ total_results|pluralize }}</h3> <!--文字提示，使用pluralize过滤器决定'result'是否是复数-->
+        {% for result in results %}                   <!--for 遍历视图中 查询的对象集results-->
+             {% with post=result.object %}             <!--使用with和result.object来获取真实的和这个结果相关联的Post对象。-->
+                <h4><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h4>      <!--使用get_absolute_url获取对应帖子的绝对url,以title超链接展示-->      
+                {{ post.body|truncatewords:5 }}                 <!--使用该过滤器获取指定帖子内容的前7个字符-->
+             {% endwith %}                                       <!--结束标签-->
+            {% empty %}                                         <!--如果查询的字段不存在-->
+                   <p>There are no results for your query.</p>  <!--给予提示-->
+        {% endfor %}                                            <!--结束遍历-->
+        <p><a href="{% url "blog:post_search" %}">返回搜索</a></p> <!--显示再次搜索-->
+    {% else %}
+        <h1>帖子搜索</h1>
+        <form action="." method="get">                          <!--渲染form表单-->
+            {{ form.as_p }}
+            <input type="submit" value="稍等...">
+        </form>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,67 @@
+
+{% extends "blog/base.html" %}
+{% load blog_tags %}  <!--加载自定义模板标签-->
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+  <h1>{{ post.title }}</h1>
+  <p class="date">
+    Published {{ post.publish }} by {{ post.author }}
+  </p>
+  {{ post.body|linebreaks }}
+
+  <!--添加如下的链接来分享帖子的URL-->
+  <p>
+  <a href="{% url "blog:post_share" post.id %}"> 
+    Share this post
+  </a>
+</p>
+
+<!--对应视图种相似帖子的渲染-->
+<h2>Similar posts</h2>
+  {% for post in similar_posts %}
+    <p>
+      <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+    </p>
+  {% empty %}
+    There are no similar posts yet.
+  {% endfor %}
+
+
+  <!--将添加评论的总数-->
+{% with comments.count as total_comments %}  <!--with 标签（tag）允许我们分配一个值给新的变量-->
+  <h2>
+    {{ total_comments }} comment{{ total_comments|pluralize }}  <!--使用一个标签显示评论总数-->
+  </h2>                                                         <!--total_comments的值，我们使用pluralize 模板（template）过滤器（filter）为单词comment显示复数后缀。-->
+{% endwith %}
+
+  <!--加入评论列表-->
+{% for comment in comments %}     <!--使用{ for }模板（template）标签（tag）来循环所有的评论-->
+  <div class="comment">
+    <p class="info">
+      Comment {{ forloop.counter }} by {{ comment.name }}  <!--使用 {{ forloop.counter }}变量来枚举所有的评论，在每次迭代中该变量都包含循环计数。并显示评论的用户名-->
+      {{ comment.created }}    <!--显示发送评论的日期-->
+    </p>
+    {{ comment.body|markdown }} <!--显示评论的内容:以markdow语法的形式显示-->
+  </div>
+{% empty %}                     <!--如果comments列为空我们会显示一个默认的信息-->
+  <p>There are no comments yet.</p> <!--告诉我们的用户这篇帖子还没有任何评论。-->
+{% endfor %}
+
+
+	<!--表单提交成功后,你需要渲染表单或者显示一条成功的信息来代替之前的内容-->
+{% if new_comment %}                                <!--如果new_comment对象存在-->
+  <h2>Your comment has been added.</h2>             <!--提示一条已经添加的信息提示-->
+{% else %}                                          <!--否则-->
+  <h2>Add a new comment</h2>                        <!--用段落<p>元素渲染表单中每一个字段，并且包含POST请求需要的CSRF令牌。-->
+  <form action="." method="post">
+    {{ comment_form.as_p }}
+    {% csrf_token %}
+    <p><input type="submit" value="Add comment"></p> 
+  </form>
+{% endif %}
+
+
+
+{% endblock %}

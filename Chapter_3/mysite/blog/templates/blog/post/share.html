@@ -1,0 +1,21 @@
+<!--专门用来显示一个表单或一条成功提示信息-->
+
+{% extends "blog/base.html" %}  <!--继承主页url-->
+
+{% block title %}Share a post{% endblock %}    <!--block区块用来定义一个title-->
+
+{% block content %} 
+  {% if sent %}                                    <!--判断如果已经发送-->
+    <h1>E-mail successfully sent</h1>              <!--显示一则标题信息-->
+    <p>                                            <!--<p> 与 </p> 之间的文本被显示为段落-->
+      "{{ post.title }}" was successfully sent to {{ cd.to }}.   <!--使用字典的方式取出被分享帖子的主题，显示一条文本信息-->
+    </p>
+  {% else %}                                          <!--如果没有发送-->
+    <h1>Share "{{ post.title }}" by e-mail</h1>       <!--将显示一条文本标题-->
+    <form action="." method="post">                   <!--显示表单内容-->
+      {{ form.as_p }}                                 <!--用as_p方法利用HTML的<p>元素来渲染它的字段。-->
+      {% csrf_token %}                                <!--安全验证可以避开(CSRF)攻击的自动生成的令牌，这是一个隐藏的字段-->
+      <input type="submit" value="Send e-mail">       <!--显示一个提交按钮，内容赋值给value-->
+    </form>
+  {% endif %}                                        
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "blog/base.html" %}
+
+{% block title %}My Blog{% endblock %}
+{% load blog_tags %}   <!--加载自定义模板标签-->
+{% block content %}
+
+
+  <h1>My Blog</h1>
+
+{% if tag %}  <!--如果有标签-->
+  <h2>Posts tagged with "{{ tag.name }}"</h2>  <!--显示标签名字-->
+{% endif %}
+
+  {% for post in posts %}
+    <h2>
+      <a href="{{ post.get_absolute_url }}">
+        {{ post.title }}
+      </a>
+
+      <p class="tags">
+       Tags: 
+       {% for tag in post.tags.all %}          <!--循环一个帖子的所有标签-->
+       <a href="{% url "blog:post_list_by_tag" tag.slug %}">  <!--通过某一标签来显示一个自定义的链接URL,用URL的名称以及标签 slug作为参数来构建URL-->
+         {{ tag.name }}   
+       </a >
+        {% if not forloop.last %}, {% endif %}  <!--使用forloop。last如果最后标签不存在，使用逗号结束-->
+       {% endfor %}
+
+      </p>    
+
+    </h2>
+    <p class="date">
+      Published {{ post.publish }} by {{ post.author }}
+    </p>
+    {{ post.body| markdown |truncatewords:30 }}  <!--以markdown显示的形式展示内容-->
+  {% endfor %}
+
+<!--对应使用{% include "pagination.html" with page=posts %}-->
+{% include "pagination.html" with page=posts %}
+<!--另一种展示方法 对应url(r'^$', views.post_list, name='post_list')url(r'^$', views.PostListView.as_view(),name='post_list -->
+
+
+{% endblock %}

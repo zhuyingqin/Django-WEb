@@ -1,0 +1,9 @@
+<!--新建模板用来展示最新新的几个帖子-->
+
+<ul>
+{% for post in latest_posts %}      <!--使用for循环遍历模板标签中提取的最新的帖子-->
+  <li>
+    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>  <!--通过get_absolute_url获取每个帖子的绝对url,并通过帖子的主题展示出来-->
+  </li>
+{% endfor %}
+</ul>
